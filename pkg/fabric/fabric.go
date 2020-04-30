@@ -22,19 +22,25 @@ import (
 type factory struct {
 	config  string
 	context *environment.Context
+	sdk     SDK
 }
 
 // interface implementation check
 var _ Factory = &factory{}
 
 // NewFactory creates a factory for the given profile/context
-func NewFactory(config *environment.Config) (Factory, error) {
-	context, err := config.GetCurrentContext()
+func NewFactory(cfg *environment.Config) (Factory, error) {
+	context, err := cfg.GetCurrentContext()
 	if err != nil {
 		return nil, err
 	}
 
-	network, err := config.GetCurrentContextNetwork()
+	network, err := cfg.GetCurrentContextNetwork()
+	if err != nil {
+		return nil, err
+	}
+
+	sdk, err := fabsdk.New(config.FromFile(os.ExpandEnv(network.ConfigPath)))
 	if err != nil {
 		return nil, err
 	}
@@ -42,16 +48,12 @@ func NewFactory(config *environment.Config) (Factory, error) {
 	return &factory{
 		config:  network.ConfigPath,
 		context: context,
+		sdk:     sdk,
 	}, nil
 }
 
 func (f *factory) SDK() (SDK, error) {
-	sdk, err := fabsdk.New(config.FromFile(os.ExpandEnv(f.config)))
-	if err != nil {
-		return nil, err
-	}
-
-	return sdk, nil
+	return f.sdk, nil
 }
 
 func (f *factory) Channel() (Channel, error) {

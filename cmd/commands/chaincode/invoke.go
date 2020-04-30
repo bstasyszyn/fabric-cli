@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -86,7 +87,10 @@ func (c *InvokeCommand) Run() error {
 		Args:        [][]byte{args},
 	}
 
-	resp, err := c.Channel.Execute(req)
+	retryOpts := retry.DefaultOpts
+	retryOpts.RetryableCodes = retry.ChannelClientRetryableCodes
+
+	resp, err := c.Channel.Execute(req, channel.WithRetry(retryOpts))
 	if err != nil {
 		return err
 	}
