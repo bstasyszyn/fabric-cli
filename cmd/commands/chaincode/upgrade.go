@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/hyperledger/fabric-cli/cmd/commands/common"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/spf13/cobra"
@@ -100,12 +101,12 @@ func (c *UpgradeCommand) Run() error {
 		return err
 	}
 
-	policy, err := getChaincodePolicy(c.ChaincodePolicy)
+	policy, err := common.GetChaincodePolicy(c.ChaincodePolicy)
 	if err != nil {
 		return err
 	}
 
-	collectionsConfig, err := getCollectionConfigFromFile(c.ChaincodeCollectionsConfig)
+	collectionsConfig, err := common.GetCollectionConfigFromFile(c.ChaincodeCollectionsConfig)
 	if err != nil {
 		return err
 	}
